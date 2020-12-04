@@ -1,5 +1,5 @@
 from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.firefox.options import Options
 from utils.logger import Logger
 import os
 
@@ -9,15 +9,18 @@ class BasePage():
     def __init__(self, url, name, headless=True):
         self.name = name
         self.url = url
-        chrome_options = Options()
+        firefox_options = Options()
         if headless:
-            chrome_options.add_argument("--headless")
-        self.driver = webdriver.Chrome("{}/drivers/chromedriver".format(os.getcwd()),
-                                       chrome_options=chrome_options)
+            firefox_options.add_argument("--headless")
+        profile = webdriver.FirefoxProfile ()
+        profile.set_preference ("general.useragent.override", "Mozilla/5.0 (Windows NT 10.0;WOW64;Trident/7.0;rv: 11.0) like Gecko")
+        profile.set_preference ('useAutomationExtension', False)
+        profile.set_preference ('devtools.jsonview.enabled', False)
+        profile.set_preference ("dom.webdriver.enabled", False)
+        profile.update_preferences ()
+        self.driver = webdriver.Firefox(firefox_options=firefox_options, firefox_profile=profile)
         self.result_dir = "{}/{}".format(os.getcwd(), self.name)
         self.logger = Logger(self.result_dir)
-        self._log_info("Web driver starting on {}".format(self.url))
-        self.get_url(self.url)
 
     def get_url(self, url):
         self._log_info("Navigating to {}".format(url))
