@@ -1,5 +1,6 @@
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
+from selenium.webdriver.common.keys import Keys
 from utils.logger import Logger
 
 import os
@@ -29,6 +30,11 @@ class BasePage():
     def get_url(self, url):
         self._log_info("Navigating to {}".format(url))
         self.driver.get(url)
+
+    def get_element(self, class_name=None, xpath=None, _id=None, name=None, link_text=None,
+                    partial_link_text=None):
+        element = self._find_element(class_name, xpath, _id, name, link_text, partial_link_text)
+        return element
 
     def click(self, class_name=None, xpath=None, _id=None, name=None, link_text=None,
               partial_link_text=None):
@@ -65,6 +71,11 @@ class BasePage():
                 time.sleep(5)
         self._log_error("Could not find element. Returning error")
         return -1, None
+
+    def open_in_new_tab(self, element):
+        href = element.get_attribute('href')
+        self.driver.find_element_by_tag_name('body').send_keys(Keys.CONTROL + 't')
+        self.driver.get(href)
 
     def _find_element(self, class_name, xpath, _id, name, link_text, partial_link_text):
         if not class_name and not xpath and not _id and not name and \
